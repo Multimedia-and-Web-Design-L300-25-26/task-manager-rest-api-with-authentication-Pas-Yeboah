@@ -9,6 +9,11 @@ import mongoose from "mongoose";
 // - createdAt (default Date.now)
 
 const taskSchema = new mongoose.Schema({
+    title:{type:String,required:true},
+    description:{type:String},
+    completed:{type:Boolean,default:false},
+    owner : {type:ObjectId,ref:"User", required:true},
+    createdAt:{type:Date,dafault:Date.now}
   
 });
 
