@@ -2,7 +2,7 @@ import User from '../models/User'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
- export const userSignUp = async(req,res)=>{
+ export const signUp = async(req,res)=>{
    try{
         const {email,password,name} = req.body
         let emailExists = User.findOne(email)
