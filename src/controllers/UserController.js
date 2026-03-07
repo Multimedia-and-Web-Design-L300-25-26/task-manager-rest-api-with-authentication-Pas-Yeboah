@@ -5,21 +5,21 @@ import jwt from 'jsonwebtoken'
  export const signUp = async(req,res)=>{
    try{
         const {email,password,name} = req.body
-        let emailExists = User.findOne(email)
+        let emailExists = await User.findOne({email})
         if(emailExists){
             res.status(200).json({error:"User already exists"})
         }
         
-           const hashedPassword = bcrypt.hash(password,10)
-           const newUser = await new User({
+        const hashedPassword = await bcrypt.hash(password,10)
+        const newUser = new User({
             email,
             password:hashedPassword,
             name
-           })
-           await newUser.save()
+        })
+        await newUser.save()
 
-           const token =  jwt.sign({email:newUser.email,name:newUser.name},process.env.JWT_SECRET,{expiresIn:"7days"})
-           res.status(201).json({message:`User ${newUser.name} has been created successfully`},{token})
+        const token =  jwt.sign({email:newUser.email,name:newUser.name},process.env.JWT_SECRET,{expiresIn:"7days"})
+        res.status(201).json({message:`User ${newUser.name} has been created successfully`,token})
             
 
         }catch(e){
@@ -32,13 +32,12 @@ import jwt from 'jsonwebtoken'
  export const login = async (req,res)=>{
         try{
             const {email, password} = req.body
-            let emailExist = User.findOne(email)
+            let emailExist = User.findOne({email})
             if(!emailExist ) return
             res.status(401).json({error:"Invalid Credentials"})
-            //let hashedPassword = User.findOne({email},password)
-            let validPassword = bcrypt.compare(password)
-            if(!validPassword) return res.status(403).json({error:"Unauthorised"})
-            const token = jwt.sign({email:User.email},process.env.JWT_SECRET,{expiresIn:"7days"})
+           let validPassword = await bcrypt.compare(password, emailExist.password)
+            if(!validPassword) return res.status(401).json({error:"Unauthorised"})
+            const token = jwt.sign( { id: emailExist._id, email: emailExist.email },process.env.JWT_SECRET,{expiresIn:"7days"})
             res.json({token})
 
         }
