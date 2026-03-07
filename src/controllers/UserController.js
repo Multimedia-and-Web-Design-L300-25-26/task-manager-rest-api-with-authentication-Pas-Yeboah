@@ -32,9 +32,11 @@ import jwt from 'jsonwebtoken'
  export const login = async (req,res)=>{
         try{
             const {email, password} = req.body
-            let emailExist = User.findOne({email})
-            if(!emailExist ) return
+            let emailExist = await User.findOne({email})
+            if(!emailExist ) {
+                return
             res.status(401).json({error:"Invalid Credentials"})
+            }
            let validPassword = await bcrypt.compare(password, emailExist.password)
             if(!validPassword) return res.status(401).json({error:"Unauthorised"})
             const token = jwt.sign( { id: emailExist._id, email: emailExist.email },process.env.JWT_SECRET,{expiresIn:"7days"})
