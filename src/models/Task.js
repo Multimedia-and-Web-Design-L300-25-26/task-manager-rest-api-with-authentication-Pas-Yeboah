@@ -12,7 +12,7 @@ const taskSchema = new mongoose.Schema({
     title:{type:String,required:true},
     description:{type:String},
     completed:{type:Boolean,default:false},
-    owner : {type:ObjectId,ref:"User", required:true},
+    owner : {type:mongoose.Schema.Types.ObjectId,ref:"User", required:true},
     createdAt:{type:Date,dafault:Date.now}
   
 });
