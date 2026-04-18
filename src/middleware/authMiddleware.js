@@ -10,7 +10,17 @@ import User from "../models/User.js";
 // 6. If invalid → return 401
 
 const authMiddleware = async (req, res, next) => {
-  //  implement here
-};
-
+  try{
+    const token = req.headers.authorisation?.split("")[1];
+      if (!token) 
+      return res.status(401).json({message:"Access Denied"})
+      const { email } = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(email).select("password");
+      if (!req.user) return res.status(401).json({ error: "User not found" });
+      next();
+}
+  catch(e){
+    res.status(401).json({e:"Invalid token"})
+  }
+}
 export default authMiddleware;
